@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>History Box</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+</head>
+
+
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">User Search History</h1>
+            <hr>
+            <form method="POST" id="search_form">
+                {% csrf_token %}
+
+                <label class="label">Choose Username:</label> {% for user in users %}
+                <input id="user_check" type="checkbox" value="{{ user }}" name="user_check"> {{ user }} &nbsp; {% endfor %}
+                <hr>
+
+                <label class="label">Choose Searching Keyword:</label> {% for keyword in keywords %}
+                <input id="keyword_check" type="checkbox" value="{{ keyword }}" name="keyword_check"> {{ keyword }} &nbsp; {% endfor %}
+                <hr>
+
+                <label class="label">Choose Maximum Browsing Duration:</label> {% for duration in durations %}
+                <input id="duration_check" type="radio" value="{{ duration }}" name="duration_check"> {{ duration }} Minutes &nbsp; {% endfor %}
+                <hr>
+
+                <label class="label">Choose Browsing Location:</label> {% for location in locations %}
+                <input id="location_check" type="checkbox" value="{{ location }}" name="location_check"> {{ location }} &nbsp; {% endfor %}
+                <hr>
+
+                
+                <label class="label">Previous Browsing Data:</label>
+                <input type="checkbox" id="time_check" name="time_check" value="Today">
+                <label for="time_check">Today</label><br>
+                <input type="checkbox" id="time_check" name="time_check" value="Last Week">
+                <label for="time_check">Last Week (Last 7 Days)</label><br>
+                <input type="checkbox" id="time_check" name="time_check" value="Last Month">
+                <label for="time_check">Last Month (Last 30 Days)</label>
+                <hr>
+
+                <label class="label">Browsing Data Before:</label>
+                <input type="date" id="before_check" name="before_check" value="before">
+                <hr>
+
+                <b>There can be many more fields...bla bla bla....</b>
+                <br/>
+                <br/>
+
+                <div class="control">
+                    <!-- may need to change the button type -->
+                    <button id="search_button" type="submit" class="button is-primary">Search</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div id=”ajax_result”>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><abbr title="Position">ID</abbr></th>
+                            <th>User</th>
+                            <th><abbr title="Played">Date</abbr></th>
+                            <th><abbr title="Won">Keyword</abbr></th>
+                            <th><abbr title="Drawn">Duration</abbr></th>
+                            <th><abbr title="Lost">Location</abbr></th>
+                        </tr>
+                    </thead>
+                    <tbody id="result_list">
+                        <!-- {% for results in final_results %} {% for ele in results %}
+                        <tr>
+                            <th>{{ ele.id }}</th>
+                            <td>{{ ele.user }}</td>
+                            <td>{{ ele.date }}</td>
+                            <td>{{ ele.keyword }}</td>
+                            <td>{{ ele.duration }}</td>
+                            <td>{{ ele.location }}</td>
+                        </tr>
+                        {% endfor %} {% endfor %} -->
+
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script>
+        $(document).ready(function() {
+            setInterval(function() {
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'search' %}",
+                    success: function(response) {
+                        //console.log(response.results);
+                        $("#result_list").empty()
+
+                        for (var key in response.results) {
+                            console.log(key)
+                                //console.log(response.results[key].user);
+                            var temp = "<tr><th>" + response.results[key].id + "</th><td>" + response.results[key].user + "</td><td>" + response.results[key].date + "</td><td>" + response.results[key].keyword + "</td><td>" + response.results[key].duration + "</td><td>" + response.results[key].location + "</td></tr>";
+                            $("#result_list").append(temp);
+                        }
+
+                    },
+                    error: function(response) {
+                        console.log("No Data Found");
+                    }
+                })
+            }, 1000);
+        });
+    </script> -->
+    <script>
+        jQuery("#search_form").on('submit', function(e) {
+            e.preventDefault();
+            jQuery.ajax({
+                type: 'POST',
+                url: "{% url 'search' %}",
+                dataType: 'json',
+                data: jQuery("#search_form").serialize(),
+                success: function(response) {
+                        //console.log(response.Fahim);
+                        $("#result_list").empty()
+                        for(var selected in response) {
+                            //console.log(response[selected])
+                            for(key in response[selected]){
+                                //console.log(response[selected][key].id)
+                                var temp = "<tr><th>" + response[selected][key].id + "</th><td>" + response[selected][key].user + "</td><td>" + response[selected][key].date + "</td><td>" + response[selected][key].keyword + "</td><td>" + response[selected][key].duration + "</td><td>" + response[selected][key].location + "</td></tr>";
+                                $("#result_list").append(temp);
+                            }
+                        }
+                    },
+                    error: function(response) {
+                        console.log("No Data Found");
+                    }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
